@@ -1,0 +1,37 @@
+----CREATE TABLE IF NOT EXISTS user (
+----    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+----    username VARCHAR(50) NOT NULL UNIQUE,
+----    email VARCHAR(100) NOT NULL UNIQUE,
+----    password VARCHAR(255) NOT NULL,
+----    role ENUM('USER', 'ADMIN') NOT NULL DEFAULT 'USER',
+----    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+----);
+----
+----CREATE TABLE IF NOT EXISTS room (
+----    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+----    room_name VARCHAR(100) NOT NULL,
+----    creator_id BIGINT NOT NULL,
+----    join_url VARCHAR(255) NOT NULL UNIQUE,
+----    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+----    CONSTRAINT fk_creator FOREIGN KEY (creator_id) REFERENCES user (id)
+----);
+----
+----CREATE TABLE IF NOT EXISTS message (
+----    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+----    room_id BIGINT NOT NULL,
+----    sender_id BIGINT NOT NULL,
+----    content TEXT NOT NULL,
+----    sent_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+----    CONSTRAINT fk_room FOREIGN KEY (room_id) REFERENCES room (id),
+----    CONSTRAINT fk_sender FOREIGN KEY (sender_id) REFERENCES user (id)
+----);
+--
+--CREATE TABLE room_membership (
+--    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+--    user_id BIGINT NOT NULL,
+--    room_id BIGINT NOT NULL,
+--    joined_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+--    UNIQUE (user_id, room_id),
+--    CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES user (id),
+--    CONSTRAINT fk_room_membership_room FOREIGN KEY (room_id) REFERENCES room (id)
+--);
