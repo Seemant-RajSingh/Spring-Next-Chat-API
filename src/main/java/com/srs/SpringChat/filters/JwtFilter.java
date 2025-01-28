@@ -38,7 +38,7 @@ public class JwtFilter extends OncePerRequestFilter {
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             System.out.println("inside first if jwt filter");
             token = authHeader.substring(7);
-            email = jwtService.extractUserName(token);
+            email = jwtService.extractEmailFromToken(token);
             System.out.println("email from jwt filter: " + email); // check
             System.out.println("token from jwt filter: " + token); // check
         }

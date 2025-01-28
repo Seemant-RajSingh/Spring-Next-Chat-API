@@ -1,5 +1,6 @@
 package com.srs.SpringChat.controllers;
 
+import com.srs.SpringChat.Utils.CustomUtils;
 import com.srs.SpringChat.dtos.MessageDTO;
 import com.srs.SpringChat.models.Message;
 import com.srs.SpringChat.models.Room;
@@ -26,11 +27,13 @@ public class ChatController {
     private final RoomRepo roomRepository;
     private final UserRepository userRepository;
     private final MessageRepository messageRepository;
+    private final CustomUtils customUtils;
 
-    public ChatController(RoomRepo roomRepository, UserRepository userRepository, MessageRepository messageRepository) {
+    public ChatController(RoomRepo roomRepository, UserRepository userRepository, MessageRepository messageRepository, CustomUtils customUtils) {
         this.roomRepository = roomRepository;
         this.userRepository = userRepository;
         this.messageRepository = messageRepository;
+        this.customUtils = customUtils;
     }
 
     @MessageMapping("/sendMessage/{roomName}")
@@ -39,31 +42,14 @@ public class ChatController {
             @DestinationVariable String roomName,
             @RequestBody MessageRequest messageRequest) {
 
-        Room room = roomRepository.findByRoomName(roomName).orElseThrow(() -> new RuntimeException("Room not found!"));
 
-        Optional<User> user = userRepository.findByUsername(messageRequest.getSender());
-        User sender = user.orElseThrow(() -> new RuntimeException("User not found!"));
+        Room room = customUtils.getRoomByNameOrThrow(roomName);
+        User sender = customUtils.getUserByEmailOrThrow(messageRequest.getSender());    // sender's email
 
-        Message message = new Message();
-        message.setContent(messageRequest.getContent());
-        message.setSender(sender);
-        message.setRoom(room);
-        message.setSentAt(LocalDateTime.now());
+        // alternate
+//        Optional<User> user = userRepository.findByUsername(messageRequest.getSender());
+//        User sender = user.orElseThrow(() -> new RuntimeException("User not found!"));
 
-        System.out.println("message created: " + message);
-
-        messageRepository.save(message);
-        System.out.println("message sent");
-
-        // Return the message using LoadMessages
-        LoadMessages loadMessage = new LoadMessages(
-                message.getId(),
-                message.getContent(),
-                sender.getUsername(),
-                sender.getEmail(),
-                message.getSentAt().toString()
-        );
-
-        return loadMessage;
+        return customUtils.saveAndReturnMessages(messageRequest, sender, room);
     }
 }

@@ -5,7 +5,6 @@ import com.srs.SpringChat.exceptions.UserAlreadyExistsException;
 import com.srs.SpringChat.models.Role;
 import com.srs.SpringChat.models.User;
 import com.srs.SpringChat.repositories.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -121,7 +120,7 @@ public class UserService {
     // -----------------------------------------------------------------------
     // ---------------------------- FETCH USER PROFILE ------------------------------------
     public User getUserProfile(String token) {
-        String email = jwtService.extractUserName(token);
+        String email = jwtService.extractEmailFromToken(token);
         Optional<User> userOptional = userRepository.findByEmail(email);
         return userOptional.orElse(null);
     }

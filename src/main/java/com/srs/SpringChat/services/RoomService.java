@@ -31,7 +31,7 @@ public class RoomService {
     public RoomDTO createRoom(String email, String roomName) {
         customUtils.checkRoomAlreadyExists(roomName);
         User creator = customUtils.getUserByEmailOrThrow(email);
-        String joinUrl = "https://chatapp.com/room/" + java.util.UUID.randomUUID().toString();
+        String joinUrl = "https://chatapp.com/room/" + java.util.UUID.randomUUID();
 
         Room room = new Room()
                 .setRoomName(roomName)
