@@ -26,23 +26,25 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/rooms")
 public class RoomController {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
+    private final RoomRepo roomRepository;
+    private final RoomMembershipRepo roomMembershipRepo;
+    private final RoomService roomService;
+    private final JwtService jwtService;
 
-    @Autowired
-    private MessageRepository messageRepository;
-
-    @Autowired
-    private RoomRepo roomRepository;
-
-    @Autowired
-    private RoomMembershipRepo roomMembershipRepo;
-
-    @Autowired
-    private RoomService roomService;
-
-    @Autowired
-    private JwtService jwtService;
+    public RoomController(
+            UserRepository userRepository,
+            RoomRepo roomRepository,
+            RoomMembershipRepo roomMembershipRepo,
+            RoomService roomService,
+            JwtService jwtService
+    ) {
+        this.userRepository = userRepository;
+        this.roomRepository = roomRepository;
+        this.roomMembershipRepo = roomMembershipRepo;
+        this.roomService = roomService;
+        this.jwtService = jwtService;
+    }
 
 
 
@@ -65,9 +67,7 @@ public class RoomController {
     @PostMapping("/join")
     public ResponseEntity<?> joinRoom(@RequestHeader("Authorization") String token, @RequestBody String joinUrl) {
         try {
-            System.out.println("in /join");
             String email = jwtService.extractUserName(token.substring(7));
-            System.out.println("email extracted : " + email);
             return ResponseEntity.ok(roomService.joinRoom(email, joinUrl));
         } catch (Exception e) {
             System.err.println("Error in RoomController /join: " + e);
@@ -78,7 +78,7 @@ public class RoomController {
 
 
 
-    @GetMapping("/user/getRooms/{email}")
+    @GetMapping("/user/{email}/getRooms")
     public ResponseEntity<?> getRoomsForUser(@PathVariable String email, @RequestHeader("Authorization") String authHeader) {
         try {
             String token = authHeader.replace("Bearer ", "");
@@ -89,7 +89,6 @@ public class RoomController {
                         .body("Bad request - requesting rooms for a different user");
             }
 
-            System.out.println("in get rooms for user controller, email: " + email);
             return ResponseEntity.ok(roomService.getRoomsForUser(email));
         } catch (Exception e) {
             System.err.println("Error in RoomController /getRooms: " + e);

@@ -39,14 +39,10 @@ public class ChatController {
             @DestinationVariable String roomName,
             @RequestBody MessageRequest messageRequest) {
 
-        System.out.println("reached message mapping function");
-
         Room room = roomRepository.findByRoomName(roomName).orElseThrow(() -> new RuntimeException("Room not found!"));
-        System.out.println("found room ----------" + room);
 
         Optional<User> user = userRepository.findByUsername(messageRequest.getSender());
         User sender = user.orElseThrow(() -> new RuntimeException("User not found!"));
-        System.out.println("found sender:  ----------" + sender);
 
         Message message = new Message();
         message.setContent(messageRequest.getContent());
@@ -65,7 +61,7 @@ public class ChatController {
                 message.getContent(),
                 sender.getUsername(),
                 sender.getEmail(),
-                message.getSentAt().toString() // You can format it as needed
+                message.getSentAt().toString()
         );
 
         return loadMessage;

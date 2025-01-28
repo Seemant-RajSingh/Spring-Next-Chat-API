@@ -19,17 +19,22 @@ import java.util.regex.Pattern;
 @Service
 public class UserService {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
+    private final BCryptPasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
+    private final AuthenticationManager authenticationManager;
 
-    @Autowired
-    private BCryptPasswordEncoder passwordEncoder;
-
-    @Autowired
-    private JwtService jwtService;
-
-    @Autowired
-    private AuthenticationManager authenticationManager;
+    public UserService(
+            UserRepository userRepository,
+            BCryptPasswordEncoder passwordEncoder,
+            JwtService jwtService,
+            AuthenticationManager authenticationManager
+    ) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.jwtService = jwtService;
+        this.authenticationManager = authenticationManager;
+    }
 
     // --------------------------------- REGISTER USER -----------------------------------
     private static final String EMAIL_EXISTS_ERROR = "Email already exists!";
@@ -59,7 +64,6 @@ public class UserService {
             throw new UserAlreadyExistsException(EMAIL_EXISTS_ERROR);
         }
 
-        System.out.println("Passed validations and existence checks");
 
         User user = new User();
         user.setUsername(userDto.getUsername().trim());
@@ -94,7 +98,7 @@ public class UserService {
         // sanitizing inputs
         validateInputsAtLogin(email, password);
 
-        // authenticating user
+        // authenticating user - check
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(email, password)
         );
@@ -117,11 +121,8 @@ public class UserService {
     // -----------------------------------------------------------------------
     // ---------------------------- FETCH USER PROFILE ------------------------------------
     public User getUserProfile(String token) {
-        System.out.println("inside get user profile");
         String email = jwtService.extractUserName(token);
-        System.out.println("email extracted: " + email);
         Optional<User> userOptional = userRepository.findByEmail(email);
-        System.out.println("user found: " + userOptional);
         return userOptional.orElse(null);
     }
 
