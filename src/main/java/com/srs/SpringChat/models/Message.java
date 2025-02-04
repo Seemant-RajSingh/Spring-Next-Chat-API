@@ -1,6 +1,6 @@
 package com.srs.SpringChat.models;
 
-import jakarta.persistence.*;
+import jakarta.persistence.*;   // all table constrains defined
 import java.time.LocalDateTime;
 
 @Entity
@@ -11,7 +11,7 @@ public class Message {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne  // many messages to same room id
     @JoinColumn(name = "room_id", nullable = false)
     private Room room;
 

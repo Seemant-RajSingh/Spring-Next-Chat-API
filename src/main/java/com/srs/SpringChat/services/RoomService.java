@@ -46,7 +46,7 @@ public class RoomService {
                 .setJoinedAt(LocalDateTime.now());
         customUtils.roomMembershipRepo.save(roomMembership);
 
-        return customUtils.mapToRoomDTO(room);
+        return customUtils.mapToRoomDTO(room);  // returns DTO
     }
 
     public List<RoomDTO> getRoomsForUser(String email) {

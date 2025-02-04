@@ -39,7 +39,7 @@ public class UserService {
     private static final String EMAIL_EXISTS_ERROR = "Email already exists!";
     private static final String INVALID_EMAIL_ERROR = "Invalid email format!";
     private static final String WEAK_PASSWORD_ERROR = "Password must be at least 8 characters, include a number and a special character.";
-    private static final String INVALID_USERNAME_ERROR = "Username can only contain alphabets and spaces.";
+    private static final String INVALID_USERNAME_ERROR = "Username can only contain alphabets, numbers and spaces.";
 
     // Email validation requirements
     private static final Pattern EMAIL_PATTERN = Pattern.compile(
@@ -122,6 +122,7 @@ public class UserService {
     public User getUserProfile(String token) {
         String email = jwtService.extractEmailFromToken(token);
         Optional<User> userOptional = userRepository.findByEmail(email);
+        // map to DTO and return
         return userOptional.orElse(null);
     }
 

@@ -83,7 +83,7 @@ public class CustomUtils {
         message.setRoom(room);
         message.setSentAt(LocalDateTime.now());
 
-        messageRepository.save(message);
+        messageRepository.save(message);    // default repo method
 
         // Return the message using LoadMessages
         return new LoadMessages(
