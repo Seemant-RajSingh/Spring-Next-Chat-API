@@ -5,6 +5,7 @@ import com.srs.SpringChat.exceptions.UserAlreadyExistsException;
 import com.srs.SpringChat.models.Role;
 import com.srs.SpringChat.models.User;
 import com.srs.SpringChat.repositories.UserRepository;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.regex.Pattern;
 
 @Service
@@ -93,16 +95,22 @@ public class UserService {
     }
     // -----------------------------------------------------------------------
     // ---------------------------- LOGIN ------------------------------------
-    public String loginUser(String email, String password) {
-        // sanitizing inputs
-        validateInputsAtLogin(email, password);
+    @Async("asyncExecutor")
+    public CompletableFuture<String> asyncLogin(String email, String password) {
+        try {
+            // Validate user input
+            validateInputsAtLogin(email, password);
 
-        // authenticating user - check
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(email, password)
-        );
+            // Authenticate user asynchronously
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(email, password)
+            );
 
-        return jwtService.generateToken(email);
+            String token = jwtService.generateToken(email);
+            return CompletableFuture.completedFuture(token);
+        } catch (Exception e) {
+            return CompletableFuture.completedFuture(null);
+        }
     }
 
     private void validateInputsAtLogin(String email, String password) {

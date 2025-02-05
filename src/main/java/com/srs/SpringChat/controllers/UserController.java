@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.concurrent.CompletableFuture;
 
 @RestController
 @RequestMapping("/api/users")
@@ -33,7 +34,9 @@ public class UserController {
     @PostMapping("/login")
     public ResponseEntity<String> login(@Valid @RequestBody UserDTO userDTO) {
         try {
-            String token = userService.loginUser(userDTO.getEmail(), userDTO.getPassword());
+            CompletableFuture<String> tokenFuture = userService.asyncLogin(userDTO.getEmail(), userDTO.getPassword());
+
+            String token = tokenFuture.join(); // Wait for the async task result
 
             if (token != null) {
                 return ResponseEntity.ok("Bearer token: " + token);
@@ -42,9 +45,10 @@ public class UserController {
             }
         } catch (Exception e) {
             System.out.println("error in user controller /login: " + e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("error while logging user in: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error while logging user in: " + e.getMessage());
         }
     }
+
 
 
     @GetMapping("/profile")
